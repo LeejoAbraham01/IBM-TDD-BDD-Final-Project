@@ -168,7 +168,7 @@ class TestProductModel(unittest.TestCase):
             product.create()
         all_products = Product.all()
         first_product_name = all_products[0].name
-        # returns number of occurrences of first product's name
+        # returns number of products with name that matches first product's name
         num_first_product_name =  len([product for product in all_products \
         if product.name == first_product_name])
         products_found_by_name = Product.find_by_name(first_product_name)
@@ -192,6 +192,21 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products_found_by_availability.count(), num_first_product_availability)
 
         for product in products_found_by_availability:
-            self.assertEqual(product.availabile, first_product_availability)
+            self.assertEqual(product.available, first_product_availability)
 
-    
+    def test_find_a_product_by_category(self):
+        """It should find a product by category"""
+        num_new_products = 10
+        for _ in range(num_new_products):
+            product = ProductFactory()
+            product.create()
+        all_products = Product.all()
+        first_product_category = all_products[0].category
+        # returns number of products with category that matches first product's category
+        num_first_product_category =  len([product for product in all_products \
+        if product.category == first_product_category])
+        products_found_by_category = Product.find_by_category(first_product_category)
+        self.assertEqual(products_found_by_category.count(), num_first_product_category)
+
+        for product in products_found_by_category:
+            self.assertEqual(product.category, first_product_category)
