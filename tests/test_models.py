@@ -120,14 +120,29 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         product.create()
         self.assertIsNotNone(product.id)
-new_description = "Test: A new description"
-        product.description_description
+
+        new_description = "A new description"
+        product.description = new_description
         original_id = product.id
         product.update()
         self.assertEqual(product.id, original_id)
         self.asserEqual(product.description, new_description)
+
         all_products = Product.all()
-                self.assertEqual(len(all_products), 1)
+        self.assertEqual(len(all_products), 1)
         self.assertEqual(all_products[0].id, original_id)
         self.assertEqual(all_products[0].description, new_description)
-# # 
+
+    def test_delete_a_product(self):
+        """It should delete a product"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        self.assertIsNotNone(product.id)
+
+        all_products = Product.all()
+        self.assertEqual(len(all_products), 1)
+
+        product.delete()
+        all_products = Product.all()
+        self.assertEqual(len(all_products), 0)
