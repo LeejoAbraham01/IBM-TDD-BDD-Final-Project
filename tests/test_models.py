@@ -72,7 +72,8 @@ class TestProductModel(unittest.TestCase):
 
     def test_create_a_product(self):
         """It should Create a product and assert that it exists"""
-        product = Product(name="Fedora", description="A red hat", price=12.50, available=True, category=Category.CLOTHS)
+        product = Product(name="Fedora", description="A red hat", price=12.50, \
+            available=True, category=Category.CLOTHS)
         self.assertEqual(str(product), "<Product Fedora id=[None]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
@@ -176,5 +177,21 @@ class TestProductModel(unittest.TestCase):
         for product in products_found_by_name:
             self.assertEqual(product.name, first_product_name)
 
-    
+    def test_find_a_product_by_availability(self):
+        """It should find a product by availability"""
+        num_new_products = 10
+        for _ in range(num_new_products):
+            product = ProductFactory()
+            product.create()
+        all_products = Product.all()
+        first_product_availability = all_products[0].available
+        # returns number of products with availabile that matches first product's availability
+        num_first_product_availability =  len([product for product in all_products \
+        if product.available == first_product_availability])
+        products_found_by_availability = Product.find_by_availability(first_product_availability)
+        self.assertEqual(products_found_by_availability.count(), num_first_product_availability)
 
+        for product in products_found_by_availability:
+            self.assertEqual(product.availabile, first_product_availability)
+
+    
