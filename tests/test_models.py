@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -72,8 +72,8 @@ class TestProductModel(unittest.TestCase):
 
     def test_create_a_product(self):
         """It should Create a product and assert that it exists"""
-        product = Product(name="Fedora", description="A red hat", price=12.50, \
-            available=True, category=Category.CLOTHS)
+        product = Product(name="Fedora", description="A red hat", price=12.50,
+                          available=True, category=Category.CLOTHS)
         self.assertEqual(str(product), "<Product Fedora id=[None]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
@@ -127,12 +127,18 @@ class TestProductModel(unittest.TestCase):
         original_id = product.id
         product.update()
         self.assertEqual(product.id, original_id)
-        self.asserEqual(product.description, new_description)
+        self.assertEqual(product.description, new_description)
 
         all_products = Product.all()
         self.assertEqual(len(all_products), 1)
         self.assertEqual(all_products[0].id, original_id)
         self.assertEqual(all_products[0].description, new_description)
+
+        product = ProductFactory()
+        product.create()
+        false_test_id = None
+        product.id = false_test_id
+        self.assertRaises(DataValidationError, product.update)
 
     def test_delete_a_product(self):
         """It should delete a product"""
@@ -169,10 +175,11 @@ class TestProductModel(unittest.TestCase):
         all_products = Product.all()
         first_product_name = all_products[0].name
         # returns number of products with name that matches first product's name
-        num_first_product_name =  len([product for product in all_products \
-        if product.name == first_product_name])
+        num_first_product_name = len([product for product in all_products
+                                      if product.name == first_product_name])
         products_found_by_name = Product.find_by_name(first_product_name)
-        self.assertEqual(products_found_by_name.count(), num_first_product_name)
+        self.assertEqual(products_found_by_name.count(),
+                         num_first_product_name)
 
         for product in products_found_by_name:
             self.assertEqual(product.name, first_product_name)
@@ -186,10 +193,12 @@ class TestProductModel(unittest.TestCase):
         all_products = Product.all()
         first_product_availability = all_products[0].available
         # returns number of products with availabile that matches first product's availability
-        num_first_product_availability =  len([product for product in all_products \
-        if product.available == first_product_availability])
-        products_found_by_availability = Product.find_by_availability(first_product_availability)
-        self.assertEqual(products_found_by_availability.count(), num_first_product_availability)
+        num_first_product_availability = len([product for product in all_products
+                                              if product.available == first_product_availability])
+        products_found_by_availability = Product.find_by_availability(
+            first_product_availability)
+        self.assertEqual(products_found_by_availability.count(),
+                         num_first_product_availability)
 
         for product in products_found_by_availability:
             self.assertEqual(product.available, first_product_availability)
@@ -203,10 +212,39 @@ class TestProductModel(unittest.TestCase):
         all_products = Product.all()
         first_product_category = all_products[0].category
         # returns number of products with category that matches first product's category
-        num_first_product_category =  len([product for product in all_products \
-        if product.category == first_product_category])
-        products_found_by_category = Product.find_by_category(first_product_category)
-        self.assertEqual(products_found_by_category.count(), num_first_product_category)
+        num_first_product_category = len([product for product in all_products
+                                          if product.category == first_product_category])
+        products_found_by_category = Product.find_by_category(
+            first_product_category)
+        self.assertEqual(products_found_by_category.count(),
+                         num_first_product_category)
 
         for product in products_found_by_category:
             self.assertEqual(product.category, first_product_category)
+
+    def test_find_a_product_by_price(self):
+        """It should find a product by price"""
+        num_new_products = 10
+        for _ in range(num_new_products):
+            product = ProductFactory()
+            product.create()
+        all_products = Product.all()
+        first_product_price = all_products[0].price
+        # returns number of products with price that matches first product's price
+        num_first_product_price = len([product for product in all_products
+                                       if product.price == first_product_price])
+        products_found_by_price = Product.find_by_price(first_product_price)
+        self.assertEqual(products_found_by_price.count(),
+                         num_first_product_price)
+
+        for product in products_found_by_price:
+            self.assertEqual(product.price, first_product_price)
+
+        product = ProductFactory()
+        product.create()
+        new_price = " 10.00 " # string with leading and trailing whitespace
+        product.price = new_price
+        self.assertIsInstance(product.price, str)
+        products_found_by_price = Product.find_by_price(new_price)
+        self.assertEqual(products_found_by_price_str[0].price, Decimal("10.00"))
+    
