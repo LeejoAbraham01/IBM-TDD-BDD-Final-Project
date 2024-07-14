@@ -224,6 +224,16 @@ class TestProductModel(unittest.TestCase):
 
     def test_find_a_product_by_price(self):
         """It should find a product by price"""
+        product = ProductFactory()
+        product.create()
+        search_price = " 10.00 " # string with leading and trailing whitespace
+        search_price_decimal = Decimal(search_price.strip(' "'))
+        product.price = search_price_decimal
+        product.update()
+        products_found_by_price = Product.find_by_price(search_price)
+        self.assertEqual(products_found_by_price[0].price, search_price_decimal)
+        product.delete()
+
         num_new_products = 10
         for _ in range(num_new_products):
             product = ProductFactory()
@@ -239,12 +249,4 @@ class TestProductModel(unittest.TestCase):
 
         for product in products_found_by_price:
             self.assertEqual(product.price, first_product_price)
-
-        product = ProductFactory()
-        product.create()
-        new_price = " 10.00 " # string with leading and trailing whitespace
-        product.price = new_price
-        self.assertIsInstance(product.price, str)
-        products_found_by_price = Product.find_by_price(new_price)
-        self.assertEqual(products_found_by_price_str[0].price, Decimal("10.00"))
     
