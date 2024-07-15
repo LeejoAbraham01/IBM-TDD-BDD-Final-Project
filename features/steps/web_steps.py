@@ -107,7 +107,7 @@ def step_impl(context, element_name):
 @when('I press the "{button}" button')
 def step_impl(context, button):
     button_id = button.lower() + '-btn'
-    context.diver.find_element(By.ID, button_id).click()
+    context.driver.find_element_by_id(button_id).click()
 
 ##################################################################
 # This code works because of the following naming convention:
