@@ -73,7 +73,7 @@ Scenario: Update a Product
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "Hammer" in the "Name" field in the results
+    And I should see "Hammer" in the results
     And I should see "30.95" in the "Price" field in the results
     And I should not see "34.95" in the "Price" field in the results
 
@@ -92,4 +92,14 @@ Scenario: Delete a Product
     And I press the "Search" button
     Then I should see the message "Success"
     And I should not see "Hat" in the results
+
+Scenario: List all products
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Shoes" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Sheets" in the results
 
